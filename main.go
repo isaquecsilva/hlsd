@@ -15,7 +15,7 @@ var (
 	endpoint  = flag.String("m3u8", "", "the m3u8 endpoint to use.")
 	queueSize = flag.Int("queue", 4, "the size of queue for asynchronous download. Becareful, the greater the size is, more memory it will use.")
 	destFile  = flag.String("file", "stream.ts", "the name of the file to store the stream bytes.")
-	logs      = flag.Bool("log", true, "Enables logging each resource downloaded.")
+	logs      = flag.Bool("log", false, "Enables logging each resource downloaded.")
 	start     = flag.Int("start", 0, "the time in seconds, from where to start downloading the vod.")
 	end       = flag.Int("end", 0, "the time in seconds, to stop downloading the vod.")
 )
