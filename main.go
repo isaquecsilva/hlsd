@@ -12,13 +12,16 @@ import (
 )
 
 var (
-	endpoint  = flag.String("m3u8", "", "the m3u8 endpoint to use.")
-	queueSize = flag.Int("queue", 4, "the size of queue for asynchronous download. Becareful, the greater the size is, more memory it will use.")
-	destFile  = flag.String("file", "stream.ts", "the name of the file to store the stream bytes.")
+	endpoint  = flag.String("m3u8", "", "The m3u8 endpoint to use.")
+	queueSize = flag.Int("queue", 4, "The size of queue for asynchronous download. Becareful, The greater The size is, more memory it will use.")
+	destFile  = flag.String("file", "stream.ts", "The name of The file to store The stream bytes.")
 	logs      = flag.Bool("log", false, "Enables logging each resource downloaded.")
-	start     = flag.Int("start", 0, "the time in seconds, from where to start downloading the vod.")
-	end       = flag.Int("end", 0, "the time in seconds, to stop downloading the vod.")
+	start     = flag.Int("start", 0, "The time in seconds, from where to start downloading The vod.")
+	end       = flag.Int("end", 0, "The time in seconds, to stop downloading The vod.")
+	version   = flag.Bool("version", false, "Shows current application version.")
 )
+
+const currentVersion = "v1.0.0"
 
 func getM3U8Reader(uri string) io.ReadCloser {
 	response, err := http.Get(uri)
@@ -32,6 +35,12 @@ func getM3U8Reader(uri string) io.ReadCloser {
 
 func main() {
 	flag.Parse()
+
+	if *version {
+		fmt.Println(currentVersion)
+		return
+	}
+
 
 	if *endpoint == "" {
 		log.Fatal("missing m3u8 endpoint.")
