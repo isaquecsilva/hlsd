@@ -1,2 +1,2 @@
 # hlsd
-thlsd is a cli tool for downloading HLS stream.
+hlsd is a cli tool for downloading HLS stream.
