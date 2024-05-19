@@ -14,7 +14,7 @@ type ParseValidationFunc = func(string) bool
 // Regexes
 var (
 	tsRegex   = regexp.MustCompile(`\.ts`)
-	timeRegex = regexp.MustCompile(`[^#EXTINF:]*\d+\.0+`)
+	timeRegex = regexp.MustCompile(`\d+\.\d+,`)
 )
 
 var DefaultParseValidationFunc = func(text string) bool {
