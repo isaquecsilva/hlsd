@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -52,41 +53,35 @@ func (hp HlsParser) Parse() error {
 
 	var secondsSum int
 
-	var textToSeconds = func(sec string) (int, error) {
-		d, err := strconv.Atoi(sec)
-
-		if err != nil {
-			return 0, err
-		}
-
-		return d, nil
-	}
-
 	for scanner.Scan() {
 		text := scanner.Text()
 
 		if match := timeRegex.FindString(text); match != "" {
-			switch d, err := textToSeconds(match[:strings.Index(match, ".")]); err {
-			case nil:
-				secondsSum += d
-			default:
+			delta, err := hp.timeSum(match)
+
+			if err != nil {
 				return err
 			}
+
+			secondsSum += delta
 		}
 
 		skip, end := hp.TimeSkipper(secondsSum)
 
-		if skip {
+		if skip || !hp.validateTS(text) {
 			continue
-		} else if end {
+		}
+
+		if end {
 			break
 		}
 
-		if !hp.validateTS(text) {
-			continue
-		}
+		if uri, err := url.Parse(text); err == nil {
+			hp.uriChan <- fmt.Sprintf("%s/%s", hp.rootEndpoint, uri.Path[1:])
 
-		hp.uriChan <- fmt.Sprintf("%s/%s", hp.rootEndpoint, text)
+		} else {
+			return err
+		}
 
 	}
 
@@ -94,10 +89,32 @@ func (hp HlsParser) Parse() error {
 	return nil
 }
 
+func (hp HlsParser) timeSum(match string) (int, error) {
+	switch d, err := hp.textToSeconds(match[:strings.Index(match, ".")]); err {
+	case nil:
+		return d, nil
+
+	default:
+		return -1, err
+	}
+}
+
+func (hp HlsParser) textToSeconds(sec string) (int, error) {
+	d, err := strconv.Atoi(sec)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return d, nil
+}
+
 func (hp HlsParser) TimeSkipper(secondsSum int) (skip, end bool) {
 	if secondsSum < hp.start {
 		skip = true
-	} else if secondsSum > hp.end && hp.end != 0 {
+	}
+
+	if secondsSum > hp.end && hp.end != 0 {
 		end = true
 	}
 
