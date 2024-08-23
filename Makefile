@@ -4,5 +4,8 @@ run:
 	@if [ -f stream.ts ]; then rm stream.ts; fi
 	go run . -m3u8 $(uri) -start 1200 -end 1800 -queue 5
 
+test:
+	@go test ./... -v
+
 help:
 	go run . -help
